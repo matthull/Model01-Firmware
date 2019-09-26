@@ -264,7 +264,7 @@ KEYMAPS(
    Key_Tab,  ___,              Key_mouseUp, ___,        Key_mouseBtnR, Key_mouseWarpEnd, Key_mouseWarpNE,
    Key_Home, Key_mouseL,       Key_mouseDn, Key_mouseR, Key_mouseBtnL, Key_mouseWarpNW,
    Key_End,  Key_PrintScreen,  Key_Insert,  ___,        Key_mouseBtnM, Key_mouseWarpSW,  Key_mouseWarpSE,
-   ___, Key_Delete, ___, ___,
+   Key_Tab,  Key_Delete, LSHIFT(Key_Backtick), ___,
    ___,
 
    Consumer_ScanPreviousTrack, Key_F6,                 Key_F7,                   Key_F8,                   Key_F9,          Key_F10,          Key_F11,
@@ -545,13 +545,13 @@ void setup() {
     /*kaleidoscope::Qukey(0, 3, 15, Key_LeftShift)   // Minus/shift*/
   /*)*/
 
-  static kaleidoscope::SpaceCadet::KeyBinding spacecadetmap[] = {
-    {Key_LeftShift, Key_LeftParen, 250},
-    {Key_RightShift, Key_RightParen, 250},
-    {Key_LeftGui, Key_LeftCurlyBracket, 250},
-    {Key_LeftAlt, Key_RightCurlyBracket, 250},
-    {Key_LeftControl, Key_LeftBracket, 250},
-    {Key_RightControl, Key_RightBracket, 250},
+  static kaleidoscope::plugin::SpaceCadet::KeyBinding spacecadetmap[] = {
+    {Key_LeftShift, Key_LeftParen, 100},
+    {Key_RightShift, Key_RightParen, 100},
+    {Key_LeftGui, Key_LeftCurlyBracket, 100},
+    {Key_LeftAlt, Key_RightCurlyBracket, 100},
+    {Key_LeftControl, Key_LeftBracket, 100},
+    {Key_RightControl, Key_RightBracket, 100},
     SPACECADET_MAP_END
   };
 
