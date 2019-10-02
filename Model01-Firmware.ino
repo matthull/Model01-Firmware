@@ -23,6 +23,9 @@
 #include "Kaleidoscope-EEPROM-Settings.h"
 #include "Kaleidoscope-EEPROM-Keymap.h"
 
+#include "Kaleidoscope-RemoteControl.h"
+
+
 // Support for communicating with the host via a simple Serial protocol
 #include "Kaleidoscope-FocusSerial.h"
 
@@ -37,6 +40,8 @@
 
 // Support for "Numpad" mode, which is mostly just the Numpad specific LED mode
 #include "Kaleidoscope-NumPad.h"
+
+#include "Kaleidoscope-LEDEffect-Dynamic.h"
 
 // Support for the "Boot greeting" effect, which pulses the 'LED' button for 10s
 // when the keyboard is connected to a computer (or that computer is powered on)
@@ -264,19 +269,63 @@ KEYMAPS(
    Key_Tab,  ___,              Key_mouseUp, ___,        Key_mouseBtnR, Key_mouseWarpEnd, Key_mouseWarpNE,
    Key_Home, Key_mouseL,       Key_mouseDn, Key_mouseR, Key_mouseBtnL, Key_mouseWarpNW,
    Key_End,  Key_PrintScreen,  Key_Insert,  ___,        Key_mouseBtnM, Key_mouseWarpSW,  Key_mouseWarpSE,
-   Key_Tab,  Key_Delete, LSHIFT(Key_Backtick), ___,
+   ___,      Key_Delete, LSHIFT(Key_Backtick), ___,
    ___,
 
    Consumer_ScanPreviousTrack, Key_F6,                 Key_F7,                   Key_F8,                   Key_F9,          Key_F10,          Key_F11,
    Consumer_PlaySlashPause,    Consumer_ScanNextTrack, Key_LeftCurlyBracket,     Key_RightCurlyBracket,    Key_LeftBracket, Key_RightBracket, Key_F12,
                                Key_LeftArrow,          Key_DownArrow,            Key_UpArrow,              Key_RightArrow,  ___,              ___,
    Key_PcApplication,          Consumer_Mute,          Consumer_VolumeDecrement, Consumer_VolumeIncrement, ___,             Key_Backslash,    Key_Pipe,
-   ___, ___, Key_Enter, ___,
+   ___,      LSHIFT(Key_Backtick), Key_Enter, Key_Tab,
    ___)
 ) // KEYMAPS(
 
 /* Re-enable astyle's indent enforcement */
 // *INDENT-ON*
+
+static void setColorsAll(uint8_t r, uint8_t g, uint8_t b) {
+  LEDControl.set_all_leds_to(CRGB(r, g, b));
+}
+
+static void setColorsLeft(uint8_t r, uint8_t g, uint8_t b) {
+  for (byte pos = 0; pos <= 26; pos++) {
+    LEDControl.setCrgbAt(pos, CRGB(r, g, b));
+  }
+}
+
+static void setColorsBottom(uint8_t r, uint8_t g, uint8_t b) {
+  for (byte pos = 27; pos <= 36; pos++) {
+    LEDControl.setCrgbAt(pos, CRGB(r, g, b));
+  }
+}
+
+static void setColorsRight(uint8_t r, uint8_t g, uint8_t b) {
+  for (byte pos = 37; pos <= 63; pos++) {
+    LEDControl.setCrgbAt(pos, CRGB(r, g, b));
+  }
+}
+
+static void setKeyColor(byte pos, uint8_t r, uint8_t g, uint8_t b) {
+  LEDControl.setCrgbAt(pos, CRGB(r, g, b));
+}
+
+uint8_t pywalLeftr = 100;
+
+//// Remote control zone coloring.
+//// Assign remote control request IDs 0 and 1 to two methods of the
+//// ColorZones plugin.
+////
+#define REMOTE_CONTROL(OP) \
+   OBJECT_METHOD(OP, 0, ::LEDControl, set_mode) \
+   GLOBAL_FUNCTION(OP, 1, setColorsAll) \
+   GLOBAL_FUNCTION(OP, 2, setColorsLeft) \
+   GLOBAL_FUNCTION(OP, 3, setColorsBottom) \
+   GLOBAL_FUNCTION(OP, 4, setColorsRight) \
+   GLOBAL_FUNCTION(OP, 5, setKeyColor) \
+   DIRECT_ACCESS(OP, 6, pywalLeftr)
+
+   
+REMOTE_CONTROL_INIT(REMOTE_CONTROL) 
 
 /** versionInfoMacro handles the 'firmware version info' macro
  *  When a key bound to the macro is pressed, this macro
@@ -344,13 +393,14 @@ const macro_t *macroAction(uint8_t macroIndex, uint8_t keyState) {
 // Keyboardio Model 01.
 
 
-static kaleidoscope::plugin::LEDSolidColor solidRed(160, 0, 0);
-static kaleidoscope::plugin::LEDSolidColor solidOrange(140, 70, 0);
-static kaleidoscope::plugin::LEDSolidColor solidYellow(130, 100, 0);
-static kaleidoscope::plugin::LEDSolidColor solidGreen(0, 160, 0);
-static kaleidoscope::plugin::LEDSolidColor solidBlue(0, 70, 130);
-static kaleidoscope::plugin::LEDSolidColor solidIndigo(0, 0, 170);
+/*static kaleidoscope::plugin::LEDSolidColor solidRed(160, 0, 0);*/
+/*static kaleidoscope::plugin::LEDSolidColor solidOrange(140, 70, 0);*/
+/*static kaleidoscope::plugin::LEDSolidColor solidYellow(130, 100, 0);*/
+/*static kaleidoscope::plugin::LEDSolidColor solidGreen(0, 160, 0);*/
+/*static kaleidoscope::plugin::LEDSolidColor solidBlue(0, 70, 130);*/
+/*static kaleidoscope::plugin::LEDSolidColor solidIndigo(0, 0, 170);*/
 static kaleidoscope::plugin::LEDSolidColor solidViolet(130, 0, 120);
+
 
 /** toggleLedsOnSuspendResume toggles the LEDs off when the host goes to sleep,
  * and turns them back on when it wakes up.
@@ -408,6 +458,7 @@ USE_MAGIC_COMBOS({.action = toggleKeyboardProtocol,
                   .keys = { R3C6, R2C6, R3C7 }
                  });
 
+
 // First, tell Kaleidoscope which plugins you want to use.
 // The order can be important. For example, LED effects are
 // added in the order they're listed here.
@@ -423,6 +474,8 @@ KALEIDOSCOPE_INIT_PLUGINS(
   // Focus allows bi-directional communication with the host, and is the
   // interface through which the keymap in EEPROM can be edited.
   Focus,
+
+  RemoteControl,
 
   // FocusSettingsCommand adds a few Focus commands, intended to aid in
   // changing some settings of the keyboard, such as the default layer (via the
@@ -449,28 +502,31 @@ KALEIDOSCOPE_INIT_PLUGINS(
 
   // The rainbow effect changes the color of all of the keyboard's keys at the same time
   // running through all the colors of the rainbow.
-  LEDRainbowEffect,
+  /*LEDRainbowEffect,*/
 
   // The rainbow wave effect lights up your keyboard with all the colors of a rainbow
   // and slowly moves the rainbow across your keyboard
-  LEDRainbowWaveEffect,
+  /*LEDRainbowWaveEffect,*/
 
   // The chase effect follows the adventure of a blue pixel which chases a red pixel across
   // your keyboard. Spoiler: the blue pixel never catches the red pixel
-  LEDChaseEffect,
+  /*LEDChaseEffect,*/
+
+  LEDDynamic,
 
   // These static effects turn your keyboard's LEDs a variety of colors
-  solidRed, solidOrange, solidYellow, solidGreen, solidBlue, solidIndigo, solidViolet,
+  /*solidRed, solidOrange, solidYellow, solidGreen, solidBlue, solidIndigo,*/
+  solidViolet,
 
   // The breathe effect slowly pulses all of the LEDs on your keyboard
-  LEDBreatheEffect,
+  /*LEDBreatheEffect,*/
 
   // The AlphaSquare effect prints each character you type, using your
   // keyboard's LEDs as a display
-  AlphaSquareEffect,
+  /*AlphaSquareEffect,*/
 
   // The stalker effect lights up the keys you've pressed recently
-  StalkerEffect,
+  /*StalkerEffect,*/
 
   // The numpad plugin is responsible for lighting up the 'numpad' mode
   // with a custom LED effect
