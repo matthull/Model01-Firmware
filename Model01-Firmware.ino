@@ -287,29 +287,21 @@ static void setColorsAll(uint8_t r, uint8_t g, uint8_t b) {
   LEDControl.set_all_leds_to(CRGB(r, g, b));
 }
 
-static void setColorsLeft(uint8_t r, uint8_t g, uint8_t b) {
-  for (byte pos = 0; pos <= 26; pos++) {
-    LEDControl.setCrgbAt(pos, CRGB(r, g, b));
-  }
+static void setColorsLeft(uint8_t r, uint8_t b, uint8_t g) {
+  LEDDynamic.set_left_color(CRGB(r, b, g));
 }
 
 static void setColorsBottom(uint8_t r, uint8_t g, uint8_t b) {
-  for (byte pos = 27; pos <= 36; pos++) {
-    LEDControl.setCrgbAt(pos, CRGB(r, g, b));
-  }
+  LEDDynamic.set_bottom_color(CRGB(r, b, g));
 }
 
 static void setColorsRight(uint8_t r, uint8_t g, uint8_t b) {
-  for (byte pos = 37; pos <= 63; pos++) {
-    LEDControl.setCrgbAt(pos, CRGB(r, g, b));
-  }
+  LEDDynamic.set_right_color(CRGB(r, b, g));
 }
 
 static void setKeyColor(byte pos, uint8_t r, uint8_t g, uint8_t b) {
   LEDControl.setCrgbAt(pos, CRGB(r, g, b));
 }
-
-uint8_t pywalLeftr = 100;
 
 //// Remote control zone coloring.
 //// Assign remote control request IDs 0 and 1 to two methods of the
@@ -321,8 +313,7 @@ uint8_t pywalLeftr = 100;
    GLOBAL_FUNCTION(OP, 2, setColorsLeft) \
    GLOBAL_FUNCTION(OP, 3, setColorsBottom) \
    GLOBAL_FUNCTION(OP, 4, setColorsRight) \
-   GLOBAL_FUNCTION(OP, 5, setKeyColor) \
-   DIRECT_ACCESS(OP, 6, pywalLeftr)
+   GLOBAL_FUNCTION(OP, 5, setKeyColor)
 
    
 REMOTE_CONTROL_INIT(REMOTE_CONTROL) 
