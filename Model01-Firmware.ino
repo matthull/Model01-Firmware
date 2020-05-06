@@ -17,7 +17,7 @@
 #include "Kaleidoscope.h"
 
 #include <Kaleidoscope-SpaceCadet.h>
-#include <Kaleidoscope-Qukeys.h>
+#include <Kaleidoscope-OneShot.h>
 
 // Support for storing the keymap in EEPROM
 #include "Kaleidoscope-EEPROM-Settings.h"
@@ -181,14 +181,14 @@ KEYMAPS(
    Key_PageUp,   Key_A, Key_S, Key_D, Key_F, Key_G,
    Key_PageDown, Key_Z, Key_X, Key_C, Key_V, Key_B, Key_Escape,
    Key_LeftControl, Key_Backspace, Key_LeftGui, Key_LeftShift,
-   ShiftToLayer(FUNCTION),
+   OSL(FUNCTION),
 
    M(MACRO_ANY),  Key_6, Key_7, Key_8,     Key_9,         Key_0,         LockLayer(NUMPAD),
    Key_Enter,     Key_Y, Key_U, Key_I,     Key_O,         Key_P,         Key_Equals,
                   Key_H, Key_J, Key_K,     Key_L,         Key_Semicolon, Key_Quote,
    Key_RightAlt,  Key_N, Key_M, Key_Comma, Key_Period,    Key_Slash,     Key_Minus,
    Key_RightShift, Key_LeftAlt, Key_Spacebar, Key_RightControl,
-   ShiftToLayer(FUNCTION)),
+   OSL(FUNCTION)),
 
 #elif defined (PRIMARY_KEYMAP_DVORAK)
 
@@ -267,7 +267,7 @@ KEYMAPS(
   [FUNCTION] =  KEYMAP_STACKED
   (___,      Key_F1,           Key_F2,      Key_F3,     Key_F4,        Key_F5,           Key_CapsLock,
    Key_Tab,  ___,              Key_mouseUp, ___,        Key_mouseBtnR, Key_mouseWarpEnd, Key_mouseWarpNE,
-   Key_Home, Key_mouseL,       Key_mouseDn, Key_mouseR, Key_mouseBtnL, Key_mouseWarpNW,
+   Key_Home, Key_Quote,       LSHIFT(Key_Quote), Key_Equals, LSHIFT(Key_Minus), Key_mouseWarpNW,
    Key_End,  Key_PrintScreen,  Key_Insert,  ___,        Key_mouseBtnM, Key_mouseWarpSW,  Key_mouseWarpSE,
    ___,      Key_Delete, LSHIFT(Key_Backtick), ___,
    ___,
@@ -454,7 +454,7 @@ USE_MAGIC_COMBOS({.action = toggleKeyboardProtocol,
 // The order can be important. For example, LED effects are
 // added in the order they're listed here.
 KALEIDOSCOPE_INIT_PLUGINS(
-  Qukeys,
+  OneShot,
   SpaceCadet,
 
   // The EEPROMSettings & EEPROMKeymap plugins make it possible to have an
@@ -582,23 +582,13 @@ void setup() {
   // `keymap.onlyCustom` command to use EEPROM layers only.
   EEPROMKeymap.setup(5);
 
-  /*QUKEYS(*/
-    /*//                  l, r, c, alt_keycode*/
-    /*//kaleidoscope::Qukey(0, 2, 1, Key_LeftGui),    // A/cmd*/
-    /*kaleidoscope::Qukey(0, 2, 2, Key_LeftAlt),      // S/alt*/
-    /*kaleidoscope::Qukey(0, 2, 3, Key_LeftControl),  // D/ctrl*/
-    /*kaleidoscope::Qukey(0, 2, 4, Key_LeftShift),    // F/shift*/
-    /*kaleidoscope::Qukey(0, 1, 14, Key_LeftShift),   // P/shift*/
-    /*kaleidoscope::Qukey(0, 3, 15, Key_LeftShift)   // Minus/shift*/
-  /*)*/
-
   static kaleidoscope::plugin::SpaceCadet::KeyBinding spacecadetmap[] = {
-    {Key_LeftShift, Key_LeftParen, 100},
-    {Key_RightShift, Key_RightParen, 100},
-    {Key_LeftGui, Key_LeftCurlyBracket, 100},
-    {Key_LeftAlt, Key_RightCurlyBracket, 100},
-    {Key_LeftControl, Key_LeftBracket, 100},
-    {Key_RightControl, Key_RightBracket, 100},
+    {Key_LeftShift, Key_LeftParen, 250},
+    {Key_RightShift, Key_RightParen, 250},
+    {Key_LeftGui, Key_LeftCurlyBracket, 250},
+    {Key_LeftAlt, Key_RightCurlyBracket, 250},
+    {Key_LeftControl, Key_LeftBracket, 250},
+    {Key_RightControl, Key_RightBracket, 250},
     SPACECADET_MAP_END
   };
 
